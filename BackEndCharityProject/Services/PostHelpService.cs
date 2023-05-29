@@ -2,6 +2,7 @@
 using BackEndCharityProject.Models.Posts;
 using BackEndCharityProject.Models.Posts.Additional;
 using BackEndCharityProject.Models.Posts.PostsHelpCRUD;
+using Geolocation;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackEndCharityProject.Services
@@ -14,6 +15,10 @@ namespace BackEndCharityProject.Services
         public Task<bool> PostDelete(int id);
         public IEnumerable<PostHelp> GetAllPosts();
         public Task<IEnumerable<PostHelpRead>> UserPostsGet(int id);
+        public Task<List<PostHelpRead>> PostCordinatesSearch(PostSearch search);
+        public Task<List<PostHelpRead>> PostRatingSearch(PostSearch search);
+        public Task<List<PostHelpRead>> PostDescriptionSearch(PostSearch search);
+        public Task<List<PostHelpRead>> PostHeaderSearch(PostSearch search);
     }
     public class PostHelpService : IPostHelpService
     {
@@ -146,6 +151,63 @@ namespace BackEndCharityProject.Services
             }
             
             return posts;
+        }
+
+        public async Task<List<PostHelpRead>> PostCordinatesSearch(PostSearch search)
+        {
+            List<PostHelp> postsTemporary = await _context.PostsHelp.ToListAsync();
+            List<PostHelpRead> posts = new List<PostHelpRead>();
+            foreach(PostHelp post in postsTemporary) 
+            {
+                if(GeoCalculator.GetDistance(search.Latitude, search.Longitude, (double)post.Lattitude, (double)post.Longtitude, 1, DistanceUnit.Kilometers) < search.Distance)
+                {
+                    posts.Add(await PostRead(post.Id));
+                }
+                
+            }
+            return posts;
+        }
+
+        public async Task<List<PostHelpRead>> PostRatingSearch(PostSearch search)
+        {
+            List<PostHelp> postsTemporary = new List<PostHelp>();
+            List<PostHelpRead> posts = new List<PostHelpRead>();
+            List<User> users = new List<User>();
+            List<Rating> ratings = new List<Rating>();
+            users = await _context.Users.Where(el => el.Rating >= search.RatingStart && el.Rating <= search.RatingEnd).ToListAsync();
+            foreach (User u in users)
+            {
+                postsTemporary = await _context.PostsHelp.Where(el => el.UserId == u.Id).ToListAsync();
+            }
+            foreach (PostHelp post in postsTemporary)
+            {
+                posts.Add(await PostRead(post.Id));
+            }
+            return posts;
+        }
+
+        public async Task<List<PostHelpRead>> PostDescriptionSearch(PostSearch search)
+        {
+            List<PostHelp> posts = new List<PostHelp>();
+            List<PostHelpRead> pg = new List<PostHelpRead>();
+            posts.AddRange(await _context.PostsHelp.Where(el => el.Description.Contains(search.Description)).ToListAsync());
+            foreach (PostHelp post in posts)
+            {
+                pg.Add(await PostRead(post.Id));
+            }
+            return pg;
+        }
+
+        public async Task<List<PostHelpRead>> PostHeaderSearch(PostSearch search)
+        {
+            List<PostHelp> posts = new List<PostHelp>();
+            List<PostHelpRead> pg = new List<PostHelpRead>();
+            posts.AddRange(await _context.PostsHelp.Where(el => el.Header.Contains(search.Header)).ToListAsync());
+            foreach(PostHelp post in posts)
+            {
+                pg.Add(await PostRead(post.Id));
+            }
+            return pg;
         }
     }
 }

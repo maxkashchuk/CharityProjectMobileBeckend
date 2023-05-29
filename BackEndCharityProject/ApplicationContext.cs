@@ -9,9 +9,9 @@ namespace BackEndCharityProject
     {
         public DbSet<User> Users { get; set; }
         public DbSet<PostHelp> PostsHelp { get; set; }
-        public DbSet<PostHelp> PostsVolunteer { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
 
@@ -33,18 +33,19 @@ namespace BackEndCharityProject
             builder.Entity<PostHelp>().Property(x => x.Description).IsRequired();
             builder.Entity<PostHelp>().Property(x => x.Header).IsRequired();
 
-            builder.Entity<PostVolunteer>().HasIndex(x => x.Id).IsUnique();
-            builder.Entity<PostVolunteer>().Property(x => x.Id).ValueGeneratedOnAdd();
-            builder.Entity<PostVolunteer>().Property(x => x.Description).IsRequired();
-            builder.Entity<PostVolunteer>().Property(x => x.Header).IsRequired();
-            builder.Entity<PostVolunteer>().Property(x => x.Goal).IsRequired();
-            builder.Entity<PostVolunteer>().Property(x => x.Donated).IsRequired();
-
             builder.Entity<Tag>().HasIndex(x => x.Id).IsUnique();
             builder.Entity<Tag>().Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Entity<Image>().HasIndex(x => x.Id).IsUnique();
             builder.Entity<Image>().Property(x => x.Id).ValueGeneratedOnAdd();
+
+            builder.Entity<Rating>().HasIndex(x => x.Id).IsUnique();
+            builder.Entity<Rating>().Property(x => x.Id).ValueGeneratedOnAdd();
+            builder.Entity<Rating>().Property(x => x.UserOriginId).IsRequired();
+            builder.Entity<Rating>().HasOne(x => x.UserOrigin).WithMany(el => el.Ratings).HasForeignKey(el => el.UserOriginId);
+            builder.Entity<Rating>().Property(x => x.UserVoteId).IsRequired();
+            builder.Entity<Rating>().HasOne(x => x.UserVote).WithMany().OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Rating>().Property(x => x.Value).IsRequired();
         }
     }
 }

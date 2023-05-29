@@ -4,6 +4,7 @@ using BackEndCharityProject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEndCharityProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230526221759_Initial_1")]
+    partial class Initial_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,6 +36,9 @@ namespace BackEndCharityProject.Migrations
                     b.Property<int?>("PostHelpsId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PostVolunteersId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
@@ -42,6 +48,8 @@ namespace BackEndCharityProject.Migrations
                         .IsUnique();
 
                     b.HasIndex("PostHelpsId");
+
+                    b.HasIndex("PostVolunteersId");
 
                     b.ToTable("Images");
                 });
@@ -57,6 +65,9 @@ namespace BackEndCharityProject.Migrations
                     b.Property<int?>("PostHelpsId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PostVolunteersId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -66,6 +77,8 @@ namespace BackEndCharityProject.Migrations
                         .IsUnique();
 
                     b.HasIndex("PostHelpsId");
+
+                    b.HasIndex("PostVolunteersId");
 
                     b.ToTable("Tags");
                 });
@@ -106,6 +119,47 @@ namespace BackEndCharityProject.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("PostsHelp");
+                });
+
+            modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostVolunteer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Donated")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Goal")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Header")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("Lattitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longtitude")
+                        .HasColumnType("float");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PostsVolunteer");
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.Posts.Rating", b =>
@@ -191,7 +245,13 @@ namespace BackEndCharityProject.Migrations
                         .WithMany("Images")
                         .HasForeignKey("PostHelpsId");
 
+                    b.HasOne("BackEndCharityProject.Models.Posts.PostVolunteer", "PostVolunteers")
+                        .WithMany("Images")
+                        .HasForeignKey("PostVolunteersId");
+
                     b.Navigation("PostHelps");
+
+                    b.Navigation("PostVolunteers");
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.Posts.Additional.Tag", b =>
@@ -200,13 +260,30 @@ namespace BackEndCharityProject.Migrations
                         .WithMany("Tags")
                         .HasForeignKey("PostHelpsId");
 
+                    b.HasOne("BackEndCharityProject.Models.Posts.PostVolunteer", "PostVolunteers")
+                        .WithMany("Tags")
+                        .HasForeignKey("PostVolunteersId");
+
                     b.Navigation("PostHelps");
+
+                    b.Navigation("PostVolunteers");
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostHelp", b =>
                 {
                     b.HasOne("BackEndCharityProject.Models.User", "User")
                         .WithMany("Posts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostVolunteer", b =>
+                {
+                    b.HasOne("BackEndCharityProject.Models.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -234,6 +311,13 @@ namespace BackEndCharityProject.Migrations
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostHelp", b =>
+                {
+                    b.Navigation("Images");
+
+                    b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostVolunteer", b =>
                 {
                     b.Navigation("Images");
 

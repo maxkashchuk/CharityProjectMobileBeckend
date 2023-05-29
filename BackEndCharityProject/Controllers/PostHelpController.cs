@@ -4,6 +4,7 @@ using BackEndCharityProject.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BackEndCharityProject.Models;
+using BackEndCharityProject.Models.Posts.Additional;
 
 namespace BackEndCharityProject.Controllers
 {
@@ -65,11 +66,59 @@ namespace BackEndCharityProject.Controllers
         }
 
         [HttpPut("postupdate/{id:int}")]
-        public async Task<IActionResult> PostUpdate(int id, [FromBody] PostHelpUpdate post)
+        public async Task<IActionResult> PostUpdate(int id, PostHelpUpdate post)
         {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (await _postHelpService.PostUpdate(id, post) == true)
             {
                 return Ok();
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("postsearchheader")]
+        public async Task<IActionResult> PostSearchHeader(PostSearch post)
+        {
+            IEnumerable<PostHelpRead> posts = await _postHelpService.PostHeaderSearch(post);
+            if (posts != null || posts.Count() != 0)
+            {
+                return Ok(posts);
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("postsearchdescription")]
+        public async Task<IActionResult> PostSearchDescription(PostSearch post)
+        {
+            IEnumerable<PostHelpRead> posts = await _postHelpService.PostDescriptionSearch(post);
+            if (posts != null || posts.Count() != 0)
+            {
+                return Ok(posts);
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("postsearchcordinates")]
+        public async Task<IActionResult> PostSearchCordinates(PostSearch post)
+        {
+            IEnumerable<PostHelpRead> posts = await _postHelpService.PostCordinatesSearch(post);
+            if (posts != null || posts.Count() != 0)
+            {
+                return Ok(posts);
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("postsearchrating")]
+        public async Task<IActionResult> PostSearchRating(PostSearch post)
+        {
+            IEnumerable<PostHelpRead> posts = await _postHelpService.PostRatingSearch(post);
+            if (posts != null || posts.Count() != 0)
+            {
+                return Ok(posts);
             }
             return BadRequest(ModelState);
         }

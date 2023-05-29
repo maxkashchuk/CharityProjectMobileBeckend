@@ -21,6 +21,7 @@ namespace BackEndCharityProject
                 options.UseSqlServer(Configuration.GetConnectionString("AzureConnection"));
             });
 
+            services.AddCors();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
@@ -42,6 +43,12 @@ namespace BackEndCharityProject
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true)
+                .AllowCredentials());
 
             app.UseAuthorization();
 

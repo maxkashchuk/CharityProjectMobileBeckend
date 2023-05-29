@@ -14,7 +14,7 @@ namespace BackEndCharityProject.Services
         public Task<User> GetCertainUser(int id);
         public Task<IEnumerable<User>> GetAllUsers();
         public Task<bool> UpdateUser(int id, UserUpdate user);
-        public Task<bool> SetRating(int id, double rating);
+        public Task<bool> SetRating(int id_origin, int id_vote, double rating);
     }
     public class UserService : IUserService
     {
@@ -45,7 +45,8 @@ namespace BackEndCharityProject.Services
                 PasswordHash = Hash(user.Password),
                 Date = user.Date,
                 Avatar = user.Avatar,
-                Gender = user.Gender
+                Gender = user.Gender,
+                Rating = 0
             };
             await _context.Users.AddAsync(u);
             await _context.SaveChangesAsync();
@@ -90,11 +91,30 @@ namespace BackEndCharityProject.Services
             return true;
         }
 
-        public async Task<bool> SetRating(int id, double rating)
+        public async Task<bool> SetRating(int id_origin, int id_vote, double rating)
         {
-            User user = await _context.Users.Where(el => el.Id == id).FirstOrDefaultAsync();
-            user.Rating = rating;
-            _context.Update(user);
+            User user_origin = await _context.Users.Where(el => el.Id == id_origin).FirstOrDefaultAsync();
+            User user_vote = await _context.Users.Where(el => el.Id == id_vote).FirstOrDefaultAsync();
+            user_origin.Ratings = await _context.Ratings.Where(el => el.UserOriginId == user_origin.Id).ToListAsync();
+            foreach (Rating r in user_origin.Ratings)
+            {
+                if (r.UserVoteId == id_vote)
+                {
+                    r.Value = rating;
+                    user_origin.Rating = user_origin.Ratings.Sum(el => el.Value) / user_origin.Ratings.Count;
+                    _context.Users.Update(user_origin);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+            }
+            user_origin.Ratings.Add(new Rating()
+            {
+                UserOrigin = user_origin,
+                UserVote = user_vote,
+                Value = rating
+            });
+            user_origin.Rating = user_origin.Ratings.Sum(el => el.Value) / user_origin.Ratings.Count;
+            _context.Users.Update(user_origin);
             await _context.SaveChangesAsync();
             return true;
         }

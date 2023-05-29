@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackEndCharityProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230519211806_Initial_1")]
-    partial class Initial_1
+    [Migration("20230529122927_Initial_4")]
+    partial class Initial_4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,9 +36,6 @@ namespace BackEndCharityProject.Migrations
                     b.Property<int?>("PostHelpsId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PostVolunteersId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
@@ -48,8 +45,6 @@ namespace BackEndCharityProject.Migrations
                         .IsUnique();
 
                     b.HasIndex("PostHelpsId");
-
-                    b.HasIndex("PostVolunteersId");
 
                     b.ToTable("Images");
                 });
@@ -65,9 +60,6 @@ namespace BackEndCharityProject.Migrations
                     b.Property<int?>("PostHelpsId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PostVolunteersId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -77,8 +69,6 @@ namespace BackEndCharityProject.Migrations
                         .IsUnique();
 
                     b.HasIndex("PostHelpsId");
-
-                    b.HasIndex("PostVolunteersId");
 
                     b.ToTable("Tags");
                 });
@@ -118,10 +108,10 @@ namespace BackEndCharityProject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PostHelp");
+                    b.ToTable("PostsHelp");
                 });
 
-            modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostVolunteer", b =>
+            modelBuilder.Entity("BackEndCharityProject.Models.Posts.Rating", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,37 +119,25 @@ namespace BackEndCharityProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Donated")
+                    b.Property<int>("UserOriginId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Goal")
+                    b.Property<int>("UserVoteId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Header")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Lattitude")
+                    b.Property<double>("Value")
                         .HasColumnType("float");
-
-                    b.Property<double>("Longtitude")
-                        .HasColumnType("float");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserOriginId");
 
-                    b.ToTable("PostVolunteer");
+                    b.HasIndex("UserVoteId");
+
+                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.User", b =>
@@ -216,13 +194,7 @@ namespace BackEndCharityProject.Migrations
                         .WithMany("Images")
                         .HasForeignKey("PostHelpsId");
 
-                    b.HasOne("BackEndCharityProject.Models.Posts.PostVolunteer", "PostVolunteers")
-                        .WithMany("Images")
-                        .HasForeignKey("PostVolunteersId");
-
                     b.Navigation("PostHelps");
-
-                    b.Navigation("PostVolunteers");
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.Posts.Additional.Tag", b =>
@@ -231,13 +203,7 @@ namespace BackEndCharityProject.Migrations
                         .WithMany("Tags")
                         .HasForeignKey("PostHelpsId");
 
-                    b.HasOne("BackEndCharityProject.Models.Posts.PostVolunteer", "PostVolunteers")
-                        .WithMany("Tags")
-                        .HasForeignKey("PostVolunteersId");
-
                     b.Navigation("PostHelps");
-
-                    b.Navigation("PostVolunteers");
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostHelp", b =>
@@ -251,15 +217,23 @@ namespace BackEndCharityProject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostVolunteer", b =>
+            modelBuilder.Entity("BackEndCharityProject.Models.Posts.Rating", b =>
                 {
-                    b.HasOne("BackEndCharityProject.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("BackEndCharityProject.Models.User", "UserOrigin")
+                        .WithMany("Ratings")
+                        .HasForeignKey("UserOriginId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("BackEndCharityProject.Models.User", "UserVote")
+                        .WithMany()
+                        .HasForeignKey("UserVoteId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("UserOrigin");
+
+                    b.Navigation("UserVote");
                 });
 
             modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostHelp", b =>
@@ -269,16 +243,11 @@ namespace BackEndCharityProject.Migrations
                     b.Navigation("Tags");
                 });
 
-            modelBuilder.Entity("BackEndCharityProject.Models.Posts.PostVolunteer", b =>
-                {
-                    b.Navigation("Images");
-
-                    b.Navigation("Tags");
-                });
-
             modelBuilder.Entity("BackEndCharityProject.Models.User", b =>
                 {
                     b.Navigation("Posts");
+
+                    b.Navigation("Ratings");
                 });
 #pragma warning restore 612, 618
         }

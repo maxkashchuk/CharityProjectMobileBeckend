@@ -80,10 +80,10 @@ namespace BackEndCharityProject.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpPut("setrating/{id:int}")]
-        public async Task<IActionResult> SetRating(int id, [FromBody] double rating)
+        [HttpPatch("setrating/{id_origin:int}/{id_vote:int}/{rating:double}")]
+        public async Task<IActionResult> SetRating([FromRoute]int id_origin, [FromRoute]int id_vote, [FromRoute]double rating)
         {
-            if (await _userService.SetRating(id, rating) == true)
+            if (await _userService.SetRating(id_origin, id_vote, rating) == true)
             {
                 return Ok();
             }

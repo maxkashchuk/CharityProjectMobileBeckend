@@ -33,7 +33,7 @@ namespace BackEndCharityProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PostHelp",
+                name: "PostsHelp",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -47,9 +47,9 @@ namespace BackEndCharityProject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PostHelp", x => x.Id);
+                    table.PrimaryKey("PK_PostsHelp", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PostHelp_Users_UserId",
+                        name: "FK_PostsHelp_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -57,7 +57,7 @@ namespace BackEndCharityProject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PostVolunteer",
+                name: "PostsVolunteer",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -66,19 +66,45 @@ namespace BackEndCharityProject.Migrations
                     Donated = table.Column<int>(type: "int", nullable: false),
                     Header = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Lattitude = table.Column<double>(type: "float", nullable: false),
-                    Longtitude = table.Column<double>(type: "float", nullable: false),
+                    Lattitude = table.Column<double>(type: "float", nullable: true),
+                    Longtitude = table.Column<double>(type: "float", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PostVolunteer", x => x.Id);
+                    table.PrimaryKey("PK_PostsVolunteer", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PostVolunteer_Users_UserId",
+                        name: "FK_PostsVolunteer_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ratings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Value = table.Column<double>(type: "float", nullable: false),
+                    UserOriginId = table.Column<int>(type: "int", nullable: false),
+                    UserVoteId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ratings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Ratings_Users_UserOriginId",
+                        column: x => x.UserOriginId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Ratings_Users_UserVoteId",
+                        column: x => x.UserVoteId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -95,14 +121,14 @@ namespace BackEndCharityProject.Migrations
                 {
                     table.PrimaryKey("PK_Images", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Images_PostHelp_PostHelpsId",
+                        name: "FK_Images_PostsHelp_PostHelpsId",
                         column: x => x.PostHelpsId,
-                        principalTable: "PostHelp",
+                        principalTable: "PostsHelp",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Images_PostVolunteer_PostVolunteersId",
+                        name: "FK_Images_PostsVolunteer_PostVolunteersId",
                         column: x => x.PostVolunteersId,
-                        principalTable: "PostVolunteer",
+                        principalTable: "PostsVolunteer",
                         principalColumn: "Id");
                 });
 
@@ -120,14 +146,14 @@ namespace BackEndCharityProject.Migrations
                 {
                     table.PrimaryKey("PK_Tags", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tags_PostHelp_PostHelpsId",
+                        name: "FK_Tags_PostsHelp_PostHelpsId",
                         column: x => x.PostHelpsId,
-                        principalTable: "PostHelp",
+                        principalTable: "PostsHelp",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Tags_PostVolunteer_PostVolunteersId",
+                        name: "FK_Tags_PostsVolunteer_PostVolunteersId",
                         column: x => x.PostVolunteersId,
-                        principalTable: "PostVolunteer",
+                        principalTable: "PostsVolunteer",
                         principalColumn: "Id");
                 });
 
@@ -148,26 +174,42 @@ namespace BackEndCharityProject.Migrations
                 column: "PostVolunteersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostHelp_Id",
-                table: "PostHelp",
+                name: "IX_PostsHelp_Id",
+                table: "PostsHelp",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostHelp_UserId",
-                table: "PostHelp",
+                name: "IX_PostsHelp_UserId",
+                table: "PostsHelp",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostVolunteer_Id",
-                table: "PostVolunteer",
+                name: "IX_PostsVolunteer_Id",
+                table: "PostsVolunteer",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostVolunteer_UserId",
-                table: "PostVolunteer",
+                name: "IX_PostsVolunteer_UserId",
+                table: "PostsVolunteer",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ratings_Id",
+                table: "Ratings",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ratings_UserOriginId",
+                table: "Ratings",
+                column: "UserOriginId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ratings_UserVoteId",
+                table: "Ratings",
+                column: "UserVoteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tags_Id",
@@ -199,13 +241,16 @@ namespace BackEndCharityProject.Migrations
                 name: "Images");
 
             migrationBuilder.DropTable(
+                name: "Ratings");
+
+            migrationBuilder.DropTable(
                 name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "PostHelp");
+                name: "PostsHelp");
 
             migrationBuilder.DropTable(
-                name: "PostVolunteer");
+                name: "PostsVolunteer");
 
             migrationBuilder.DropTable(
                 name: "Users");

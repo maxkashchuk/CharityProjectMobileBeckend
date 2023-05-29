@@ -15,6 +15,7 @@ namespace BackEndCharityProject.Models
         public string Avatar { get; set; }
         public bool Gender { get; set; }
         public double? Rating { get; set; }
+        public ICollection<Rating> Ratings { get; set; }
 
     }
 }
