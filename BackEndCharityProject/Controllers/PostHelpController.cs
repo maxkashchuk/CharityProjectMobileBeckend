@@ -34,9 +34,9 @@ namespace BackEndCharityProject.Controllers
         }
 
         [HttpGet("getallposts")]
-        public IActionResult GetAllPosts()
+        public async Task<IActionResult> UserPostsGet()
         {
-            IEnumerable<PostHelp> posts = _postHelpService.GetAllPosts();
+            IEnumerable<PostHelpRead> posts = await _postHelpService.GetAllPosts();
             if (posts != null)
             {
                 return Ok(posts);
@@ -116,6 +116,28 @@ namespace BackEndCharityProject.Controllers
         public async Task<IActionResult> PostSearchRating(PostSearch post)
         {
             IEnumerable<PostHelpRead> posts = await _postHelpService.PostRatingSearch(post);
+            if (posts != null || posts.Count() != 0)
+            {
+                return Ok(posts);
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("postsearchusername")]
+        public async Task<IActionResult> PostSearchUserName(PostSearch post)
+        {
+            IEnumerable<PostHelpRead> posts = await _postHelpService.PostUserNameSearch(post);
+            if (posts != null || posts.Count() != 0)
+            {
+                return Ok(posts);
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost("postsearchusersurname")]
+        public async Task<IActionResult> PostSearchUserSurname(PostSearch post)
+        {
+            IEnumerable<PostHelpRead> posts = await _postHelpService.PostUserSurnameSearch(post);
             if (posts != null || posts.Count() != 0)
             {
                 return Ok(posts);

@@ -27,6 +27,7 @@ namespace BackEndCharityProject
             services.AddSwaggerGen();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPostHelpService, PostHelpService>();
+            services.AddCors();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -44,11 +45,7 @@ namespace BackEndCharityProject
 
             app.UseRouting();
 
-            app.UseCors(x => x
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .SetIsOriginAllowed(origin => true)
-                .AllowCredentials());
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
 
             app.UseAuthorization();
 

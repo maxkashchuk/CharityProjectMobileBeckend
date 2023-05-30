@@ -12,5 +12,8 @@ namespace BackEndCharityProject.Models.Posts.Additional
         public double Distance { get; set; }
         public double RatingStart { get; set; }
         public double RatingEnd { get; set; }
+        public string Tag { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
     }
 }

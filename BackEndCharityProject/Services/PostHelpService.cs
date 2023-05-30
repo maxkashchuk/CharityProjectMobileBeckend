@@ -13,12 +13,14 @@ namespace BackEndCharityProject.Services
         public Task<PostHelpRead> PostRead(int id);
         public Task<bool> PostUpdate(int id, PostHelpUpdate post);
         public Task<bool> PostDelete(int id);
-        public IEnumerable<PostHelp> GetAllPosts();
+        public Task<IEnumerable<PostHelpRead>> GetAllPosts();
         public Task<IEnumerable<PostHelpRead>> UserPostsGet(int id);
         public Task<List<PostHelpRead>> PostCordinatesSearch(PostSearch search);
         public Task<List<PostHelpRead>> PostRatingSearch(PostSearch search);
         public Task<List<PostHelpRead>> PostDescriptionSearch(PostSearch search);
         public Task<List<PostHelpRead>> PostHeaderSearch(PostSearch search);
+        public Task<List<PostHelpRead>> PostUserNameSearch(PostSearch search);
+        public Task<List<PostHelpRead>> PostUserSurnameSearch(PostSearch search);
     }
     public class PostHelpService : IPostHelpService
     {
@@ -28,9 +30,18 @@ namespace BackEndCharityProject.Services
             this._context = _context;
         }
 
-        public IEnumerable<PostHelp> GetAllPosts()
+        public async Task<IEnumerable<PostHelpRead>> GetAllPosts()
         {
-            return _context.PostsHelp.ToList();
+            List<PostHelpRead> posts = new List<PostHelpRead>();
+
+            List<PostHelp> posts_help = await _context.PostsHelp.ToListAsync();
+
+            foreach (PostHelp p in posts_help)
+            {
+                posts.Add(await PostRead(p.Id));
+            }
+
+            return posts;
         }
 
         public async Task<bool> PostCreate(PostHelpAdd post)
@@ -150,6 +161,48 @@ namespace BackEndCharityProject.Services
                 posts.Add(await PostRead(p.Id));
             }
             
+            return posts;
+        }
+
+        public async Task<List<PostHelpRead>> PostUserNameSearch(PostSearch search)
+        {
+            List<PostHelpRead> posts = new List<PostHelpRead>();
+
+            List<PostHelp> postsHelp = new List<PostHelp>();
+
+            List<User> users = await _context.Users.Where(el => el.Name.Contains(search.Name)).ToListAsync();
+
+            foreach (User user in users) 
+            {
+                postsHelp.AddRange(await _context.PostsHelp.Where(el => el.UserId == user.Id).ToListAsync());
+            }
+
+            foreach(PostHelp p in postsHelp)
+            {
+                posts.Add(await PostRead(p.Id));
+            }
+
+            return posts;
+        }
+
+        public async Task<List<PostHelpRead>> PostUserSurnameSearch(PostSearch search)
+        {
+            List<PostHelpRead> posts = new List<PostHelpRead>();
+
+            List<PostHelp> postsHelp = new List<PostHelp>();
+
+            List<User> users = await _context.Users.Where(el => el.Surname.Contains(search.Surname)).ToListAsync();
+
+            foreach (User user in users)
+            {
+                postsHelp.AddRange(await _context.PostsHelp.Where(el => el.UserId == user.Id).ToListAsync());
+            }
+
+            foreach (PostHelp p in postsHelp)
+            {
+                posts.Add(await PostRead(p.Id));
+            }
+
             return posts;
         }
 
