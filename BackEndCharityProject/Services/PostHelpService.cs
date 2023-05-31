@@ -132,6 +132,7 @@ namespace BackEndCharityProject.Services
                 p.Images = images;
             }
             p.Description = (post.Description != null) ? post.Description : p.Description;
+            p.Money = (post.Money != null) ? post.Money : p.Money;
             p.Lattitude = (post.Lattitude != null) ? post.Lattitude : p.Lattitude;
             p.Longtitude = (post.Longtitude != null) ? post.Longtitude : p.Longtitude;
             if(post.Tags != null)
