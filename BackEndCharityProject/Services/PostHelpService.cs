@@ -133,8 +133,8 @@ namespace BackEndCharityProject.Services
             }
             p.Description = (post.Description != null) ? post.Description : p.Description;
             p.Money = (post.Money != null) ? post.Money : p.Money;
-            p.Lattitude = (post.Lattitude != null) ? post.Lattitude : p.Lattitude;
-            p.Longtitude = (post.Longtitude != null) ? post.Longtitude : p.Longtitude;
+            p.Lattitude = post.Lattitude;
+            p.Longtitude = post.Longtitude;
             if(post.Tags != null)
             {
                 _context.Tags.RemoveRange(await _context.Tags.Where(el => el.PostHelps == p).ToListAsync());
