@@ -120,17 +120,30 @@ namespace BackEndCharityProject.Services
         {
             PostHelp p = await _context.PostsHelp.Where(el => el.Id == id).FirstOrDefaultAsync();
             p.Header = (post.Header != null) ? post.Header : p.Header;
-            if(post.Images != null)
+            //if(post.Images != null)
+            //{
+            //    _context.Images.RemoveRange(await _context.Images.Where(el => el.PostHelps == p).ToListAsync());
+            //    await _context.SaveChangesAsync();
+
+            //}
+            List<Image> imgs = await _context.Images.ToListAsync();
+            foreach (Image img in imgs) 
             {
-                _context.Images.RemoveRange(await _context.Images.Where(el => el.PostHelps == p).ToListAsync());
-                await _context.SaveChangesAsync();
-                List<Image> images = new List<Image>();
-                for (int i = 0; i < post.Images.Count; i++)
+                foreach(string image in post.Images)
                 {
-                    images.Add(new Image() { Value = post.Images.ToList()[i] });
+                    if(img.Value == image)
+                    {
+                        _context.Images.Remove(img);
+                    }
                 }
-                p.Images = images;
             }
+            await _context.SaveChangesAsync();
+            List<Image> images = new List<Image>();
+            for (int i = 0; i < post.Images.Count; i++)
+            {
+                images.Add(new Image() { Value = post.Images.ToList()[i] });
+            }
+            p.Images = images;
             p.Description = (post.Description != null) ? post.Description : p.Description;
             p.Money = (post.Money != null) ? post.Money : p.Money;
             p.Lattitude = post.Lattitude;
